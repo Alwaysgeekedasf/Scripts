@@ -1,9 +1,8 @@
--- === CUSTOM BLACK UI (Same usage as CalmLib) ===
 local module = {}
 
 function module:win(title)
     local sg = Instance.new("ScreenGui")
-    sg.Name = "CustomBlackHub"
+    sg.Name = "BlackHub"
     sg.ResetOnSpawn = false
     sg.Parent = (gethui or get_hidden_gui or function() return game:GetService("CoreGui") end)()
 
@@ -17,22 +16,23 @@ function module:win(title)
     main.Parent = sg
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
+    corner.CornerRadius = UDim.new(0, 14)
     corner.Parent = main
 
     -- Title Bar
     local titleBar = Instance.new("Frame")
     titleBar.Size = UDim2.new(1, 0, 0, 55)
     titleBar.BackgroundColor3 = Color3.fromRGB(13, 13, 13)
+    titleBar.BorderSizePixel = 0
     titleBar.Parent = main
 
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Size = UDim2.new(1, -60, 1, 0)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = "  " .. title
-    titleLabel.TextColor3 = Color3.fromRGB(190, 140, 255)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 24
+    titleLabel.TextColor3 = Color3.fromRGB(180, 140, 255)
+    titleLabel.Font = Enum.Font.GothamBlack
+    titleLabel.TextSize = 26
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = titleBar
 
@@ -51,12 +51,14 @@ function module:win(title)
         sg:Destroy()
     end)
 
-    local tabsContainer = Instance.new("Frame")
-    tabsContainer.Size = UDim2.new(1, 0, 0, 50)
-    tabsContainer.Position = UDim2.new(0, 0, 0, 55)
-    tabsContainer.BackgroundTransparency = 1
-    tabsContainer.Parent = main
+    -- Tab Bar
+    local tabBar = Instance.new("Frame")
+    tabBar.Size = UDim2.new(1, 0, 0, 50)
+    tabBar.Position = UDim2.new(0, 0, 0, 55)
+    tabBar.BackgroundTransparency = 1
+    tabBar.Parent = main
 
+    -- Content Area (No Scrollbar)
     local content = Instance.new("Frame")
     content.Size = UDim2.new(1, 0, 1, -105)
     content.Position = UDim2.new(0, 0, 0, 105)
@@ -64,43 +66,47 @@ function module:win(title)
     content.Parent = main
 
     local pages = {}
-    local currentTab = nil
+    local current = nil
+
+    local function newTab(name)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 160, 1, 0)
+        btn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        btn.Text = name
+        btn.TextColor3 = Color3.fromRGB(210, 210, 255)
+        btn.Font = Enum.Font.GothamSemibold
+        btn.TextSize = 18
+        btn.Parent = tabBar
+
+        local page = Instance.new("Frame")  -- Changed from ScrollingFrame to Frame (no scrollbar)
+        page.Size = UDim2.new(1, 0, 1, 0)
+        page.BackgroundTransparency = 1
+        page.Visible = false
+        page.Parent = content
+
+        btn.MouseButton1Click:Connect(function()
+            if current then current.Visible = false end
+            page.Visible = true
+            current = page
+        end)
+
+        return page
+    end
 
     local sections = {}
 
     function sections:tab(tabName, icon)
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Size = UDim2.new(0, 160, 1, 0)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-        tabBtn.Text = tabName
-        tabBtn.TextColor3 = Color3.fromRGB(220, 220, 255)
-        tabBtn.Font = Enum.Font.GothamSemibold
-        tabBtn.TextSize = 18
-        tabBtn.Parent = tabsContainer
-
-        local page = Instance.new("ScrollingFrame")
-        page.Size = UDim2.new(1, 0, 1, 0)
-        page.BackgroundTransparency = 1
-        page.ScrollBarThickness = 6
-        page.Visible = false
-        page.Parent = content
-
-        tabBtn.MouseButton1Click:Connect(function()
-            if currentTab then currentTab.Visible = false end
-            page.Visible = true
-            currentTab = page
-        end)
+        local page = newTab(tabName)
 
         local contents = {}
 
         function contents:toggle(name, default, callback)
-            -- simple toggle (you can expand later)
-            print("Toggle created:", name, default)
-            -- Add actual toggle UI here if you want
+            print("Toggle:", name, default)
+            -- You can add actual toggle UI here later
         end
 
         function contents:button(name, callback)
-            print("Button created:", name)
+            print("Button:", name)
         end
 
         return contents
