@@ -1,112 +1,150 @@
+--[[
+    CalmLib - Black Edition
+    Modified for full black/dark theme
+]]
+
 local module = {}
+local ts = cloneref(game:GetService("TweenService"))
+local cg = cloneref(game:GetService("CoreGui"))
+local ui = cloneref(game:GetService("UserInputService"))
 
 function module:win(title)
-    local sg = Instance.new("ScreenGui")
-    sg.Name = "BlackHub"
-    sg.ResetOnSpawn = false
-    sg.Parent = (gethui or get_hidden_gui or function() return game:GetService("CoreGui") end)()
+    local window = game:GetObjects("rbxassetid://96576283085736")[1]
+    local elements = game:GetObjects("rbxassetid://83539751566719")[1]
 
-    local main = Instance.new("Frame")
-    main.Size = UDim2.new(0, 680, 0, 460)
-    main.Position = UDim2.new(0.5, -340, 0.5, -230)
-    main.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
-    main.BorderSizePixel = 0
-    main.Active = true
-    main.Draggable = true
-    main.Parent = sg
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 14)
-    corner.Parent = main
-
-    -- Title Bar
-    local titleBar = Instance.new("Frame")
-    titleBar.Size = UDim2.new(1, 0, 0, 55)
-    titleBar.BackgroundColor3 = Color3.fromRGB(13, 13, 13)
-    titleBar.BorderSizePixel = 0
-    titleBar.Parent = main
-
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, -60, 1, 0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = "  " .. title
-    titleLabel.TextColor3 = Color3.fromRGB(180, 140, 255)
-    titleLabel.Font = Enum.Font.GothamBlack
-    titleLabel.TextSize = 26
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = titleBar
-
-    -- Close Button
-    local close = Instance.new("TextButton")
-    close.Size = UDim2.new(0, 40, 0, 40)
-    close.Position = UDim2.new(1, -50, 0, 8)
-    close.BackgroundTransparency = 1
-    close.Text = "✕"
-    close.TextColor3 = Color3.fromRGB(255, 80, 80)
-    close.TextSize = 28
-    close.Font = Enum.Font.GothamBold
-    close.Parent = titleBar
-
-    close.MouseButton1Click:Connect(function()
-        sg:Destroy()
-    end)
-
-    -- Tab Bar
-    local tabBar = Instance.new("Frame")
-    tabBar.Size = UDim2.new(1, 0, 0, 50)
-    tabBar.Position = UDim2.new(0, 0, 0, 55)
-    tabBar.BackgroundTransparency = 1
-    tabBar.Parent = main
-
-    -- Content Area (No Scrollbar)
-    local content = Instance.new("Frame")
-    content.Size = UDim2.new(1, 0, 1, -105)
-    content.Position = UDim2.new(0, 0, 0, 105)
-    content.BackgroundTransparency = 1
-    content.Parent = main
-
-    local pages = {}
-    local current = nil
-
-    local function newTab(name)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0, 160, 1, 0)
-        btn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-        btn.Text = name
-        btn.TextColor3 = Color3.fromRGB(210, 210, 255)
-        btn.Font = Enum.Font.GothamSemibold
-        btn.TextSize = 18
-        btn.Parent = tabBar
-
-        local page = Instance.new("Frame")  -- Changed from ScrollingFrame to Frame (no scrollbar)
-        page.Size = UDim2.new(1, 0, 1, 0)
-        page.BackgroundTransparency = 1
-        page.Visible = false
-        page.Parent = content
-
-        btn.MouseButton1Click:Connect(function()
-            if current then current.Visible = false end
-            page.Visible = true
-            current = page
-        end)
-
-        return page
+    local hui = gethui or get_hidden_gui or nil
+    if hui then
+        window.Parent = hui()
+    else
+        window.Parent = cg
     end
 
-    local sections = {}
+    local frame = window.Frame
+    local topbar = frame.topbar
 
-    function sections:tab(tabName, icon)
-        local page = newTab(tabName)
+    -- === FULL BLACK THEME ===
+    frame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+    topbar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    frame.tabscontainer.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+    frame.sectionsholder.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+
+    topbar.title.Text = title
+    topbar.title.TextColor3 = Color3.fromRGB(220, 220, 220)
+
+    local closeBtn = topbar.btns.Close
+    local miniBtn = topbar.btns.Minimize
+
+    local toggleCon = nil
+
+    local function fadebtn(btn, isIn)
+        ts:Create(btn, TweenInfo.new(0.15), {BackgroundTransparency = isIn and 0.7 or 1}):Play()
+    end
+
+    local function togglewin(isIn)
+        ts:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+            {GroupTransparency = isIn and 0 or 1}):Play()
+        ts:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+            {Size = isIn and UDim2.new(0.37, 0, 0.407, 0) or UDim2.new(0.37, 0, 0.376, 0)}):Play()
+        frame.Interactable = isIn
+    end
+
+    closeBtn.MouseEnter:Connect(function() fadebtn(closeBtn, true) end)
+    miniBtn.MouseEnter:Connect(function() fadebtn(miniBtn, true) end)
+    closeBtn.MouseLeave:Connect(function() fadebtn(closeBtn, false) end)
+    miniBtn.MouseLeave:Connect(function() fadebtn(miniBtn, false) end)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        window:Destroy()
+        elements:Destroy()
+        if toggleCon then toggleCon:Disconnect() end
+    end)
+
+    miniBtn.MouseButton1Click:Connect(function()
+        togglewin(false)
+    end)
+
+    toggleCon = ui.InputBegan:Connect(function(keyc, gamep)
+        if not gamep and keyc.KeyCode == Enum.KeyCode.K then
+            togglewin(not frame.Interactable)
+        end
+    end)
+
+    -- Dragging (ensured)
+    local dragging, dragInput, dragStart, startPos
+    topbar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+
+    topbar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    ui.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    local sections = {}
+    local curSelected = nil
+
+    function sections:tab(title, ico)
+        local newBtn = elements.tabelement:Clone()
+        newBtn.Name = title
+        newBtn.Image = ico
+        newBtn.title.Text = title
+        newBtn.Parent = frame.tabscontainer
+
+        local newSect = elements.sectioncanvas:Clone()
+        newSect.Parent = frame.sectionsholder
+        newSect.GroupTransparency = 1
+        newSect.Position = UDim2.new(0.5, 0, 1.1, 0)
+        newSect.Interactable = false
 
         local contents = {}
 
-        function contents:toggle(name, default, callback)
-            print("Toggle:", name, default)
-            -- You can add actual toggle UI here later
+        function contents:label(title)
+            local l = elements.LabelElement:Clone()
+            l.lbl.Text = title
+            l.Parent = newSect.sectioncontainer
         end
 
-        function contents:button(name, callback)
-            print("Button:", name)
+        function contents:button(title, cb)
+            local b = elements.ButtonElement:Clone()
+            b.btn.lbl.Text = title
+            b.Parent = newSect.sectioncontainer
+            b.btn.MouseButton1Click:Connect(cb)
+        end
+
+        function contents:toggle(title, default, cb)
+            local toggled = default
+            local t = elements.ToggleElement:Clone()
+            t.btn.lbl.Text = title
+            t.Parent = newSect.sectioncontainer
+
+            local bg = t.btn.togglebg
+            local dot = bg.Frame
+
+            if toggled then
+                bg.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
+                dot.Position = UDim2.new(1,0,0.5,0)
+                dot.AnchorPoint = Vector2.new(1,0.5)
+            end
+
+            t.btn.MouseButton1Click:Connect(function()
+                toggled = not toggled
+                dot.AnchorPoint = toggled and Vector2.new(1,0.5) or Vector2.new(0,0.5)
+                dot.Position = toggled and UDim2.new(1,0,0.5,0) or UDim2.new(0,0,0.5,0)
+                bg.BackgroundColor3 = toggled and Color3.fromRGB(0, 170, 100) or Color3.fromRGB(170, 0, 0)
+                cb(toggled)
+            end)
         end
 
         return contents
