@@ -4,8 +4,8 @@ local cg = cloneref(game:GetService("CoreGui"))
 local ui = cloneref(game:GetService("UserInputService"))
 
 function module:win(title)
-    local window = game:GetObjects("rbxassetid://96576283085736")[1]
-    local elements = game:GetObjects("rbxassetid://83539751566719")[1]
+    local window = window
+    local elements = window
     -- === FORCE ALL BLACK THEME ===
     local frame = window.Frame
     local topbar = frame.topbar
