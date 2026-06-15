@@ -4,25 +4,8 @@ local cg = cloneref(game:GetService("CoreGui"))
 local ui = cloneref(game:GetService("UserInputService"))
 
 function module:win(title)
-    local window = window
-    local elements = window
-    -- === FORCE ALL BLACK THEME ===
-    local frame = window.Frame
-    local topbar = frame.topbar
-
-    frame.BackgroundColor3 = Color3.fromRGB(6, 6, 6)
-    topbar.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
-    frame.tabscontainer.BackgroundColor3 = Color3.fromRGB(9, 9, 9)
-    frame.sectionsholder.BackgroundColor3 = Color3.fromRGB(6, 6, 6)
-
-    topbar.title.TextColor3 = Color3.fromRGB(210, 210, 210)
-
-    -- Make tabs darker
-    for _, v in pairs(frame.tabscontainer:GetChildren()) do
-    if v:IsA("ImageButton") or v:IsA("TextButton") then
-        v.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    end
-end
+    local window = game:GetObjects("rbxassetid://96576283085736")[1]
+    local elements = game:GetObjects("rbxassetid://83539751566719")[1]
 
     local hui = gethui or get_hidden_gui or nil
     if hui then
